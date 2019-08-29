@@ -1,0 +1,12 @@
+<mat-toolbar color="secondary">
+  <header class="hui-container">
+    <h1>Dashboard</h1>
+  </header>
+</mat-toolbar>
+
+<gridster [options]="options">
+  <gridster-item [item]="sensor" *ngFor="let sensor of sensors">
+    <hui-dashboard-item [item]="sensor"></hui-dashboard-item>
+  </gridster-item>
+</gridster>
+

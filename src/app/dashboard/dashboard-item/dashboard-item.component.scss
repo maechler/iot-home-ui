@@ -1,0 +1,26 @@
+@import "~src/sass/_variables.scss";
+
+.hui-dashboard-item {
+  padding: $hui-base-space;
+
+  &.hui-dashboard-item-type-value {
+    position: relative;
+    height: 100%;
+    text-align: center;
+
+    .hui-dashboard-item-type-value-inner {
+      position: absolute;
+      top: 50%;
+      width: calc(100% - 2 * #{$hui-base-space});
+      transform: translateY(-50%);
+
+      .hui-dashboard-item-value {
+        font-size: 72px;
+        line-height:  72px;
+      }
+      .hui-dashboard-item-label {
+
+      }
+    }
+  }
+}

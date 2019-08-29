@@ -1,0 +1,18 @@
+@import "~src/sass/_variables.scss";
+
+:host {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+gridster {
+  flex: 1;
+  background: transparent;
+  margin: $hui-base-space 0;
+
+  ::ng-deep .gridster-column,
+  ::ng-deep .gridster-row {
+    border-color: transparent;
+  }
+}

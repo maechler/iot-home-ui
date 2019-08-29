@@ -1,0 +1,5 @@
+$hui-primary: mat-palette($mat-indigo);
+$hui-accent: mat-palette($mat-pink, A200, A100, A400);
+$hui-warn: mat-palette($mat-deep-orange, A200);
+
+$hui-theme: mat-light-theme($hui-primary, $hui-accent, $hui-warn);

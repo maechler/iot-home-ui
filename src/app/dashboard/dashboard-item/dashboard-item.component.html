@@ -1,0 +1,11 @@
+<div class="hui-dashboard-item hui-dashboard-item-type-{{item.type}}" [ngSwitch]="item.type" #element>
+  <ng-container *ngSwitchCase="'value'">
+    <div class="hui-dashboard-item-type-{{item.type}}-inner">
+      <div class="hui-dashboard-item-value" #value>{{item.value}}</div>
+      <div class="hui-dashboard-item-label" #label>{{item.name}}</div>
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchCase="'diagramm'">
+    <div>diagramm: {{item.name}}</div>
+  </ng-container>
+</div>

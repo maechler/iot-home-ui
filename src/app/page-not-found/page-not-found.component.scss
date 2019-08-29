@@ -1,0 +1,19 @@
+@import "~src/sass/_variables.scss";
+
+.hui-page-not-found-box {
+  position: relative;
+  height: 500px;
+  margin: $hui-base-space 0;
+
+  .hui-page-not-found-box-inner {
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+
+    h1 {
+      font-family: 'Press Start 2P', cursive;
+    }
+  }
+}
