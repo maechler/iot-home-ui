@@ -1,5 +1,20 @@
+@import '~@angular/material/theming';
+
 $hui-primary: mat-palette($mat-indigo);
 $hui-accent: mat-palette($mat-pink, A200, A100, A400);
 $hui-warn: mat-palette($mat-deep-orange, A200);
 
 $hui-theme: mat-light-theme($hui-primary, $hui-accent, $hui-warn);
+
+@mixin hui-app-theme($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $warn: map-get($theme, accent);
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+
+  a {
+    text-decoration: none;
+    color: mat-color($accent, 500);
+  }
+}

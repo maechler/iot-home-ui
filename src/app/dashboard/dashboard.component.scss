@@ -6,6 +6,24 @@
   flex-direction: column;
 }
 
+.hui-dashboard-toolbar-buttons {
+  text-align: right;
+}
+
+.hui-dashboard-no-items {
+  flex: 1;
+  margin: $hui-base-space 0;
+  padding: $hui-base-space;
+
+  .hui-dashboard-no-items-inner {
+    position: absolute;
+    width: calc(100% - #{4*$hui-base-space});
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+  }
+}
+
 gridster {
   flex: 1;
   background: transparent;

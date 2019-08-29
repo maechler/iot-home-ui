@@ -1,6 +1,6 @@
 <mat-toolbar color="primary">
   <header class="hui-container">
-    <h1><a href="/">{{title}}</a></h1>
+    <h1><a routerLink="/">{{title}}</a></h1>
   </header>
 </mat-toolbar>
 
@@ -9,5 +9,12 @@
 </main>
 
 <footer class="hui-container">
-  <mat-toolbar color="secondary">Markus Mächler</mat-toolbar>
+  <mat-toolbar color="secondary">
+    <div fxFlex="50%">
+      <a href="https://github.com/maechler" target="_blank">Markus Mächler</a>
+    </div>
+    <div fxFlex="50%" class="hui-app-copyright">
+      <span>&copy; Copyright {{year}}</span>
+    </div>
+  </mat-toolbar>
 </footer>

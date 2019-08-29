@@ -1,8 +1,14 @@
 @import "~src/sass/_variables.scss";
 
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .hui-page-not-found-box {
+  flex: 1;
   position: relative;
-  height: 500px;
   margin: $hui-base-space 0;
 
   .hui-page-not-found-box-inner {

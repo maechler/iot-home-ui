@@ -1,6 +1,11 @@
 import {GridsterItem} from 'angular-gridster2';
 import {isNumeric} from 'rxjs/internal-compatibility';
-import {BehaviorSubject, Subject} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
+
+export interface DashboardItemPosition {
+  x: number;
+  y: number;
+}
 
 export class DashboardItem implements GridsterItem {
   cols = 1;
@@ -17,9 +22,9 @@ export class DashboardItem implements GridsterItem {
 
   size$ = new BehaviorSubject('1x1');
 
-  public constructor(public name, size, public type = 'value') {
+  public constructor(public name, size?: string, public type = 'value') {
     if (size) {
-      this.size$.next(size);
+      this.setSize(size);
     }
   }
 
@@ -43,5 +48,14 @@ export class DashboardItem implements GridsterItem {
     this.maxSizeY = rows;
     this.minSizeX = cols;
     this.minSizeY = rows;
+  }
+
+  public getPosition(): DashboardItemPosition {
+    return {x: this.x, y: this.y};
+  }
+
+  public setPosition(newPosition: DashboardItemPosition) {
+    this.x = newPosition.x;
+    this.y = newPosition.y;
   }
 }

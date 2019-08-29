@@ -1,19 +1,13 @@
 @import '~@angular/material/theming';
 
-@mixin hui-dashboard-theme($theme) {
+@mixin hui-dashboard-item-theme($theme) {
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
   $warn: map-get($theme, accent);
   $foreground: map-get($theme, foreground);
   $background: map-get($theme, background);
 
-  gridster {
-    gridster-preview {
-      background: mat-color($accent, 50);
-    }
-  }
-
-  .hui-dashboard-no-items {
-    background: mat-color($background, app-bar);
+  .hui-dashboard-item-value {
+    color: mat-color($primary, 500);
   }
 }

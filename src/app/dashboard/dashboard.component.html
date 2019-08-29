@@ -1,12 +1,32 @@
 <mat-toolbar color="secondary">
-  <header class="hui-container">
-    <h1>Dashboard</h1>
-  </header>
+  <div fxFlex="50%">
+    <h2>Dashboard</h2>
+  </div>
+  <div fxFlex="50%" class="hui-dashboard-toolbar-buttons">
+    <button mat-button color="accent" routerLink="add-item">
+      <mat-icon aria-hidden="false" aria-label="Example home icon">add_circle</mat-icon>
+      Add dashboard item
+    </button>
+    <button mat-button color="accent" routerLink="settings">
+      <mat-icon aria-hidden="false" aria-label="Example home icon">settings</mat-icon>
+      Settings
+    </button>
+  </div>
 </mat-toolbar>
 
-<gridster [options]="options">
-  <gridster-item [item]="sensor" *ngFor="let sensor of sensors">
-    <hui-dashboard-item [item]="sensor"></hui-dashboard-item>
-  </gridster-item>
-</gridster>
+<ng-container *ngIf="(items$ | async)?.length">
+  <gridster [options]="options">
+    <gridster-item [item]="item" *ngFor="let item of items$ | async">
+      <hui-dashboard-item [item]="item"></hui-dashboard-item>
+    </gridster-item>
+  </gridster>
+</ng-container>
 
+<div class="hui-dashboard-no-items" *ngIf="!(items$ | async)?.length">
+  <div class="hui-dashboard-no-items-inner">
+    <h3>No items yet added</h3>
+    <p>Please use the <a routerLink="add-item">Add dashboard item</a> dialog to add items.</p>
+  </div>
+</div>
+
+<router-outlet></router-outlet>

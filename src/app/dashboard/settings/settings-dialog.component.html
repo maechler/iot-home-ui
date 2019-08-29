@@ -1,0 +1,22 @@
+<h1 mat-dialog-title>Settings</h1>
+<div mat-dialog-content class="hui-dashboard-settings-dialog-form-fields">
+  <mat-form-field>
+    <input matInput [(ngModel)]="data.influxdbServer" placeholder="InfluxDB Server">
+  </mat-form-field>
+  <mat-form-field>
+    <input matInput [(ngModel)]="data.influxdbDatabase" placeholder="InfluxDB Database">
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Refresh rate" [(ngModel)]="data.refreshRate">
+      <mat-option value="1">1s</mat-option>
+      <mat-option value="5">5s</mat-option>
+      <mat-option value="10">10s</mat-option>
+      <mat-option value="30">30s</mat-option>
+      <mat-option value="60">60s</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onCloseClick()" color="accent">Cancel</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial color="accent">Update settings</button>
+</div>
