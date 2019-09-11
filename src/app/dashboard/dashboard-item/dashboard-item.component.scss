@@ -3,6 +3,19 @@
 .hui-dashboard-item {
   padding: $hui-base-space;
 
+  .hui-dashboard-item-actions {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: right;
+    padding: $hui-base-space;
+
+    mat-icon {
+      cursor: pointer;
+    }
+  }
+
   &.hui-dashboard-item-type-value {
     position: relative;
     height: 100%;
@@ -15,11 +28,22 @@
       transform: translateY(-50%);
 
       .hui-dashboard-item-value {
-        font-size: 72px;
-        line-height:  72px;
+        font-size: 48px;
+        line-height:  48px;
       }
-      .hui-dashboard-item-label {
+      .hui-dashboard-item-label-sensor {
+        font-weight: bold;
+        font-size: 1rem;
+        padding: $hui-base-space 0 $hui-base-space/2 0;
+      }
+    }
 
+    &.hui-dashboard-item-size-2x2 {
+      .hui-dashboard-item-type-value-inner {
+        .hui-dashboard-item-value {
+          font-size: 120px;
+          line-height:  120px;
+        }
       }
     }
   }

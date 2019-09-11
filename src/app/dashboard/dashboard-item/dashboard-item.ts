@@ -1,6 +1,8 @@
 import {GridsterItem} from 'angular-gridster2';
 import {isNumeric} from 'rxjs/internal-compatibility';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {SensorService} from '../../shared/sensor/sensor.service';
+import {Measurement} from '../../shared/sensor/measurement';
 
 export interface DashboardItemPosition {
   x: number;
@@ -18,18 +20,19 @@ export class DashboardItem implements GridsterItem {
   minSizeX = 1;
   minSizeY = 1;
 
-  value = 42.0;
-
   size$ = new BehaviorSubject('1x1');
+  value$: Observable<Measurement>;
 
-  public constructor(public name, size?: string, public type = 'value') {
+  public constructor(public unit: string, public sensor: string, private sensorService: SensorService, size?: string, public type = 'value') {
     if (size) {
       this.setSize(size);
     }
-  }
 
-  public setValue(value: number): void {
-    this.value = value;
+    switch (type) {
+      case 'value':
+      default:
+        this.value$ = this.sensorService.getSensorObservable(unit, sensor);
+    }
   }
 
   public setSize(size: string): void {

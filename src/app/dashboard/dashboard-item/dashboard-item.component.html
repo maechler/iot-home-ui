@@ -1,8 +1,24 @@
-<div class="hui-dashboard-item hui-dashboard-item-type-{{item.type}}" [ngSwitch]="item.type" #element>
+<div class="hui-dashboard-item hui-dashboard-item-type-{{item.type}} hui-dashboard-item-size-{{item.size$ | async}}" [ngSwitch]="item.type">
+  <div class="hui-dashboard-item-actions">
+    <mat-icon aria-hidden="false" aria-label="Example home icon" color="accent" (click)="deleteItem($event, item)" (mousedown)="mouseDown($event)">delete</mat-icon>
+  </div>
   <ng-container *ngSwitchCase="'value'">
     <div class="hui-dashboard-item-type-{{item.type}}-inner">
-      <div class="hui-dashboard-item-value" #value>{{item.value}}</div>
-      <div class="hui-dashboard-item-label" #label>{{item.name}}</div>
+      <ng-container *ngIf="item.value$ | async; then valueAvailable; else noValueAvailable"></ng-container>
+      <ng-template #valueAvailable>
+        <div class="hui-dashboard-item-value">
+          {{(item.value$ | async).value | number : '1.1-1'}}
+        </div>
+        <div class="hui-dashboard-item-label-sensor">{{item.sensor}}</div>
+        <div class="hui-dashboard-item-label-unit">{{item.unit}}</div>
+        <div class="hui-dashboard-item-label-date">{{(item.value$ | async).time | date : 'medium'}}</div>
+      </ng-template>
+      <ng-template #noValueAvailable>
+        <div class="hui-dashboard-item-value">?</div>
+        <div class="hui-dashboard-item-label-sensor">{{item.sensor}}</div>
+        <div class="hui-dashboard-item-label-unit">{{item.unit}}</div>
+        <div class="hui-dashboard-item-label-date"></div>
+      </ng-template>
     </div>
   </ng-container>
   <ng-container *ngSwitchCase="'diagramm'">

@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {GridsterConfig, GridType} from 'angular-gridster2';
+import {CompactType, DisplayGrid, GridsterConfig, GridType} from 'angular-gridster2';
 import {DashboardItem} from './dashboard-item/dashboard-item';
 import {SensorService} from '../shared/sensor/sensor.service';
 import {DashboardItemsService} from './dashboard-items.service';
@@ -13,23 +13,17 @@ import {Observable} from 'rxjs';
 })
 export class DashboardComponent implements OnInit {
   options: GridsterConfig;
-
   items$: Observable<DashboardItem[]>;
 
-  static itemChange(item, itemComponent) {
-    console.info('itemChanged', item, itemComponent);
-  }
-
-  static itemResize(item, itemComponent) {
-    console.info('itemResized', item, itemComponent);
+  itemChange() {
+    this.dashboardItemsService.storeItems();
   }
 
   constructor(private httpClient: HttpClient, private sensorService: SensorService, private dashboardItemsService: DashboardItemsService) {}
 
   ngOnInit() {
     this.options = {
-      itemChangeCallback: DashboardComponent.itemChange,
-      itemResizeCallback: DashboardComponent.itemResize,
+      itemChangeCallback: this.itemChange.bind(this),
       gridType: GridType.ScrollVertical,
       margin: 12,
       outerMargin: false,
@@ -42,6 +36,8 @@ export class DashboardComponent implements OnInit {
       colWidth: 'auto',
       defaultSizeX: 1,
       defaultSizeY: 1,
+      compactType: CompactType.CompactUp,
+      displayGrid: DisplayGrid.None,
       draggable: {
         enabled: true,
       },
@@ -54,8 +50,8 @@ export class DashboardComponent implements OnInit {
     this.items$ = this.dashboardItemsService.items$;
   }
 
-  changedOptions() {
-    this.options.api.optionsChanged();
+  onItemDeleted(item: DashboardItem) {
+    this.removeItem(item);
   }
 
   removeItem(item: DashboardItem) {

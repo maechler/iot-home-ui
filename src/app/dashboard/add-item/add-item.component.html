@@ -1,8 +1,13 @@
 <h1 mat-dialog-title>Add dashboard item</h1>
 <div mat-dialog-content class="hui-dashboard-add-item-dialog-form-fields">
   <mat-form-field>
-    <mat-select placeholder="Unit" [(ngModel)]="data.selectedUnit">
+    <mat-select placeholder="Unit" [ngModel]="data.selectedUnit$ | async" (ngModelChange)="data.unitChangeHandler($event)" >
       <mat-option value="{{unit.name}}" *ngFor="let unit of data.units | async">{{unit.name}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Sensor" [(ngModel)]="data.selectedSensor" [disabled]="!(data.sensors$ | async)">
+      <mat-option value="{{sensor.name}}" *ngFor="let sensor of data.sensors$ | async">{{sensor.name}}</mat-option>
     </mat-select>
   </mat-form-field>
   <mat-form-field>
@@ -17,5 +22,5 @@
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onCloseClick()" color="accent">Cancel</button>
-  <button mat-button [mat-dialog-close]="data" cdkFocusInitial color="accent">Add new item</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial color="accent" [disabled]="!data.selectedSensor">Add new item</button>
 </div>

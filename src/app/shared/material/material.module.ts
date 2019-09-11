@@ -8,6 +8,7 @@ import {
   MatIconModule,
   MatInputModule,
   MatSelectModule,
+  MatSnackBarModule,
   MatToolbarModule
 } from '@angular/material';
 import {FormsModule} from '@angular/forms';
@@ -24,6 +25,7 @@ import {FormsModule} from '@angular/forms';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatSnackBarModule,
   ],
   exports: [
     FlexLayoutModule,
@@ -35,6 +37,7 @@ import {FormsModule} from '@angular/forms';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatSnackBarModule,
   ],
   declarations: []
 })

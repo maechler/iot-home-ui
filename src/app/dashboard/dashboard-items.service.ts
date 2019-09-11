@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {DashboardItem} from './dashboard-item/dashboard-item';
 import {BehaviorSubject} from 'rxjs';
-import {Settings} from './settings/settings-dialog.component';
+import {SensorService} from '../shared/sensor/sensor.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,9 +9,9 @@ import {Settings} from './settings/settings-dialog.component';
 export class DashboardItemsService {
   private readonly _items = new BehaviorSubject<DashboardItem[]>([]);
   readonly items$ = this._items.asObservable();
-  private readonly settingsStorageKey = 'dashboard.items';
+  private readonly settingsStorageKey = 'hui.dashboard.items';
 
-  constructor() {
+  constructor(private sensorService: SensorService) {
     this.readItemsFromStore();
   }
 
@@ -25,11 +25,20 @@ export class DashboardItemsService {
   }
 
   removeItem(item: DashboardItem) {
-    this._items.next(this._items.getValue().filter(i => i === item));
+    const items = this._items.getValue();
+
+    items.splice(items.indexOf(item), 1);
+
+    this._items.next(items);
+    this.storeItems();
   }
 
   getItems(): DashboardItem[] {
     return this._items.getValue();
+  }
+
+  createItem(unit: string, sensor: string, size?: string, type? : string): DashboardItem {
+    return new DashboardItem(unit, sensor, this.sensorService, size, type);
   }
 
   private readItemsFromStore() {
@@ -39,7 +48,7 @@ export class DashboardItemsService {
       const storedItems = JSON.parse(storageItems);
 
       const items = storedItems.map((item) => {
-        const dashboardItem = new DashboardItem(item.name, item.size, item.type);
+        const dashboardItem = this.createItem(item.unit, item.sensor, item.size, item.type);
 
         dashboardItem.setPosition(item.position);
 
@@ -55,7 +64,8 @@ export class DashboardItemsService {
       return {
         size: item.size$.getValue(),
         type: item.type,
-        name: item.name,
+        unit: item.unit,
+        sensor: item.sensor,
         position: item.getPosition(),
       };
     });
