@@ -3,6 +3,8 @@ import {isNumeric} from 'rxjs/internal-compatibility';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {SensorService} from '../../shared/sensor/sensor.service';
 import {Measurement} from '../../shared/sensor/measurement';
+import {ChartDataSets} from 'chart.js';
+import * as uuid from 'uuid';
 
 export interface DashboardItemPosition {
   x: number;
@@ -10,6 +12,18 @@ export interface DashboardItemPosition {
 }
 
 export class DashboardItem implements GridsterItem {
+  // TODO change to enums
+  public static sizes = ['1x1', '2x2', '1x2', '1x3', '1x4'];
+  public static types = ['value', 'chart'];
+  public static durations = ['365d', '180d', '30d', '14d', '7d', '1d', '12h', '4h', '60m', '30m', '15m'];
+  public static sensorUnits = {
+    humidity: 'AH',
+    temperature: 'C',
+    pressure: 'Pa',
+    earth: 'mg/L',
+    light: 'lux',
+  };
+
   cols = 1;
   rows = 1;
   x = 0;
@@ -22,17 +36,40 @@ export class DashboardItem implements GridsterItem {
 
   size$ = new BehaviorSubject('1x1');
   value$: Observable<Measurement>;
+  series$: Observable<Measurement[]>;
+  series: ChartDataSets[];
+  labels: Array<Date>;
+  duration$ = new BehaviorSubject('7d');
 
-  public constructor(public unit: string, public sensor: string, private sensorService: SensorService, size?: string, public type = 'value') {
+  public constructor(public unit: string, public sensor: string, private sensorService: SensorService, size?: string, public type = 'value', public id?: string) {
     if (size) {
       this.setSize(size);
     }
 
+    this.series = [{data: [], label: unit + '-' + sensor}];
+
+    if (!id) {
+      this.id = uuid.v4();
+    }
+
     switch (type) {
+      case 'chart':
+        this.series$ = this.sensorService.getSeriesObservable(unit, sensor, this.duration$);
+        this.series$.subscribe((measurements) => {
+          if (measurements) {
+            this.labels = measurements.map(measurement => measurement.time);
+            this.series = [{data: measurements.map(measurement => ({t: measurement.time, y: measurement.value})), label: unit + '-' + sensor}];
+          }
+        });
+        break;
       case 'value':
       default:
-        this.value$ = this.sensorService.getSensorObservable(unit, sensor);
+        this.value$ = this.sensorService.getValueObservable(unit, sensor);
     }
+  }
+
+  public setDuration(duration: string): void {
+    this.duration$.next(duration);
   }
 
   public setSize(size: string): void {

@@ -28,4 +28,10 @@ gridster {
   flex: 1;
   background: transparent;
   margin: $hui-base-space 0;
+
+  gridster-item {
+    display: flex !important;
+    flex-direction: column;
+    flex: 1;
+  }
 }

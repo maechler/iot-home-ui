@@ -12,7 +12,7 @@ import {MatSnackBar} from '@angular/material';
   providedIn: 'root'
 })
 export class SensorService {
-  private _activeSensors = {};
+  private _valueObservables = {};
   private _influxdbServer: string;
   private _influxdbDatabase: string;
   private _refreshRate: number;
@@ -30,10 +30,10 @@ export class SensorService {
       }
     }).pipe(
       map( (response: any) => {
-        const responseUnits = response.results[0].series[0].values[0];
+        const responseUnits = response.results[0].series[0].values;
 
-        return responseUnits.map(name => {
-          return {name: name};
+        return responseUnits.map(value => {
+          return {name: value[0]};
         });
       }),
       catchError( error => {
@@ -65,23 +65,59 @@ export class SensorService {
     );
   }
 
-  getSensorObservable(unit: string, sensor: string): Observable<Measurement> {
-    if (this._activeSensors[this.getSensorKey(unit, sensor)] === undefined) {
-      this._activeSensors[this.getSensorKey(unit, sensor)] = {
+  getSeriesObservable(unit: string, sensor: string, duration$: BehaviorSubject<string>): Observable<Measurement[]> {
+    const observable = new BehaviorSubject(null);
+    let currentTimeout = -1;
+
+    const fetchSeries = (unit, sensor, duration$) => {
+      this._httpClient.get<Unit[]>(this._influxdbServer + '/query', {
+        params: {
+          db: this._influxdbDatabase,
+          q: 'SELECT ' + sensor + ' FROM ' + unit + ' WHERE time > now() - ' + duration$.getValue(),
+        }
+      }).pipe(
+        map((response: any) => response.results[0].series[0].values.map((value) => ({value: value[1], time: new Date(value[0])}))),
+        catchError( error => {
+          this.handleError(error);
+
+          return of({value: 0, time: null});
+        })
+      ).subscribe((measurements) => {
+        currentTimeout = setTimeout(() => {
+          fetchSeries(unit, sensor, duration$);
+        }, this._refreshRate * 1000);
+
+        observable.next(measurements);
+      });
+    };
+
+    duration$.subscribe(() => {
+      clearTimeout(currentTimeout);
+      fetchSeries(unit, sensor, duration$);
+    });
+
+    fetchSeries(unit, sensor, duration$);
+
+    return observable;
+  }
+
+  getValueObservable(unit: string, sensor: string): Observable<Measurement> {
+    if (this._valueObservables[this.getSensorKey(unit, sensor)] === undefined) {
+      this._valueObservables[this.getSensorKey(unit, sensor)] = {
         unit: unit,
         sensor: sensor,
         observable: new BehaviorSubject(null),
         timeout: -1,
       };
 
-      this.makeRequest(unit, sensor);
+      this.fetchValue(unit, sensor);
     }
 
-    return this._activeSensors[this.getSensorKey(unit, sensor)].observable;
+    return this._valueObservables[this.getSensorKey(unit, sensor)].observable;
   }
 
-   private makeRequest(unit, sensor) {
-     const activeSensor = this._activeSensors[this.getSensorKey(unit, sensor)];
+   private fetchValue(unit, sensor) {
+     const activeSensor = this._valueObservables[this.getSensorKey(unit, sensor)];
 
      this._httpClient.get<Unit[]>(this._influxdbServer + '/query', {
        params: {
@@ -89,27 +125,25 @@ export class SensorService {
          q: 'SELECT ' + sensor + ' FROM ' + unit + ' ORDER BY DESC LIMIT 1 ',
        }
      }).pipe(
-       map((response: any) => {
-         return {
-           value: response.results[0].series[0].values[0][1],
-           time: new Date(response.results[0].series[0].values[0][0])
-         };
-       }),
+       map((response: any) => ({
+         value: response.results[0].series[0].values[0][1],
+         time: new Date(response.results[0].series[0].values[0][0])
+       })),
        catchError( error => {
          this.handleError(error);
          return of({value: 0, time: null});
        })
      ).subscribe((measurement) => {
-       this._activeSensors[this.getSensorKey(unit, sensor)].timeout = setTimeout(() => {
-         this.makeRequest(unit, sensor);
+       this._valueObservables[this.getSensorKey(unit, sensor)].timeout = setTimeout(() => {
+         this.fetchValue(unit, sensor);
        }, this._refreshRate * 1000);
 
        activeSensor.observable.next(measurement);
      });
   }
 
-  private getSensorKey(unit, sensor) {
-    return unit + '-' + sensor;
+  private getSensorKey(unit, sensor, duration?) {
+    return unit + '-' + sensor + (duration ? '-' + duration : '');
   }
 
   private updateSettings() {
@@ -129,11 +163,11 @@ export class SensorService {
   private handleSettingsChanged() {
     this.updateSettings();
 
-    Object.keys(this._activeSensors).forEach(key => {
-      const sensor = this._activeSensors[key];
+    Object.keys(this._valueObservables).forEach(key => {
+      const sensor = this._valueObservables[key];
 
       clearTimeout(sensor.timeout);
-      this.makeRequest(sensor.unit, sensor.sensor);
+      this.fetchValue(sensor.unit, sensor.sensor);
     });
   }
 }

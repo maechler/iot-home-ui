@@ -10,6 +10,9 @@ import { SettingsDialogComponent } from './settings/settings-dialog.component';
 import { SettingsDialogEntryComponent } from './settings/settings-dialog-entry.component';
 import { AddItemComponent } from './add-item/add-item.component';
 import { AddItemEntryComponent } from './add-item/add-item-entry.component';
+import {ChartsModule} from 'ng2-charts';
+import {EditItemComponent} from './edit-item/edit-item.component';
+import {EditItemEntryComponent} from './edit-item/edit-item-entry.component';
 
 @NgModule({
   imports: [
@@ -17,6 +20,7 @@ import { AddItemEntryComponent } from './add-item/add-item-entry.component';
     MaterialModule,
     GridsterModule,
     DashboardRoutingModule,
+    ChartsModule,
   ],
   declarations: [
     DashboardComponent,
@@ -25,7 +29,9 @@ import { AddItemEntryComponent } from './add-item/add-item-entry.component';
     SettingsDialogEntryComponent,
     AddItemComponent,
     AddItemEntryComponent,
+    EditItemComponent,
+    EditItemEntryComponent,
   ],
-  entryComponents: [SettingsDialogComponent, AddItemComponent],
+  entryComponents: [SettingsDialogComponent, AddItemComponent, EditItemComponent],
 })
 export class DashboardModule { }

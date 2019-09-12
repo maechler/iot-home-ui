@@ -37,8 +37,18 @@ export class DashboardItemsService {
     return this._items.getValue();
   }
 
-  createItem(unit: string, sensor: string, size?: string, type? : string): DashboardItem {
-    return new DashboardItem(unit, sensor, this.sensorService, size, type);
+  getItemById(id: string): DashboardItem {
+    for (const item of this.getItems()) {
+      if (item.id === id) {
+        return item;
+      }
+    }
+
+    return null;
+  }
+
+  createItem(unit: string, sensor: string, size?: string, type?: string, id?: string): DashboardItem {
+    return new DashboardItem(unit, sensor, this.sensorService, size, type, id);
   }
 
   private readItemsFromStore() {
@@ -48,7 +58,7 @@ export class DashboardItemsService {
       const storedItems = JSON.parse(storageItems);
 
       const items = storedItems.map((item) => {
-        const dashboardItem = this.createItem(item.unit, item.sensor, item.size, item.type);
+        const dashboardItem = this.createItem(item.unit, item.sensor, item.size, item.type, item.id);
 
         dashboardItem.setPosition(item.position);
 
@@ -62,6 +72,7 @@ export class DashboardItemsService {
   public storeItems() {
     const storeItems = this.getItems().map((item) => {
       return {
+        id: item.id,
         size: item.size$.getValue(),
         type: item.type,
         unit: item.unit,

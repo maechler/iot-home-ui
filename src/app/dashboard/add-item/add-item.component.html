@@ -11,12 +11,13 @@
     </mat-select>
   </mat-form-field>
   <mat-form-field>
+    <mat-select placeholder="Type" [(ngModel)]="data.type">
+      <mat-option value="{{type}}" *ngFor="let type of types">{{type}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
     <mat-select placeholder="Size" [(ngModel)]="data.size">
-      <mat-option value="1x1">1x1</mat-option>
-      <mat-option value="2x2">2x2</mat-option>
-      <mat-option value="1x2">1x2</mat-option>
-      <mat-option value="1x3">1x3</mat-option>
-      <mat-option value="1x4">1x4</mat-option>
+      <mat-option value="{{size}}" *ngFor="let size of sizes">{{size}}</mat-option>
     </mat-select>
   </mat-form-field>
 </div>

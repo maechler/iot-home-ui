@@ -1,0 +1,28 @@
+<h1 mat-dialog-title>Edit dashboard item</h1>
+
+<div mat-dialog-content class="hui-dashboard-edit-item-dialog-form-fields">
+  <mat-form-field>
+    <mat-select placeholder="Size" [(ngModel)]="data.size">
+      <mat-option value="{{size}}" *ngFor="let size of sizes">{{size}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field *ngIf="data.item && data.item.type === 'chart'">
+    <mat-select placeholder="Duration" [(ngModel)]="data.duration">
+      <mat-option value="{{duration}}" *ngFor="let duration of durations">{{duration}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field *ngIf="data.item && data.item.type === 'chart'">
+    <mat-select placeholder="Color" [(ngModel)]="data.color">
+      <mat-option value="{{color}}" *ngFor="let color of colors">{{color}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onCloseClick()" color="accent">Cancel</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial color="accent">Save item</button>
+  <button mat-button aria-hidden="false" aria-label="Example home icon" color="accent">
+    <mat-icon>delete</mat-icon>
+    Delete item
+  </button>
+</div>

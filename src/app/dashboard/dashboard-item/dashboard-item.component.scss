@@ -1,7 +1,16 @@
 @import "~src/sass/_variables.scss";
 
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .hui-dashboard-item {
   padding: $hui-base-space;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 
   .hui-dashboard-item-actions {
     position: absolute;

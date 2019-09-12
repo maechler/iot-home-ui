@@ -30,6 +30,7 @@ export class AddItemEntryComponent {
         sensors$: this.sensors$,
         selectedSensor: '',
         selectedUnit$: this.selectedUnit$,
+        type: 'value',
         size: '1x1',
       }
     });
@@ -44,7 +45,7 @@ export class AddItemEntryComponent {
       this.router.navigate(['../'], { relativeTo: this.route });
 
       if (result) {
-        this.dashboardItemsService.addItem(this.dashboardItemsService.createItem(result.selectedUnit$.getValue(), result.selectedSensor, result.size));
+        this.dashboardItemsService.addItem(this.dashboardItemsService.createItem(result.selectedUnit$.getValue(), result.selectedSensor, result.size, result.type));
       }
     });
   }
