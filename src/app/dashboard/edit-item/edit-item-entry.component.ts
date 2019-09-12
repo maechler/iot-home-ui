@@ -13,7 +13,7 @@ export class EditItemEntryComponent {
 
   constructor(public addItemDialog: MatDialog, private router: Router, private route: ActivatedRoute, private sensorService: SensorService, private dashboardItemsService: DashboardItemsService) {
     this.route.paramMap.subscribe(paramMap => {
-      this.itemId = paramMap.params.id;
+      this.itemId = paramMap.get('id');
     });
 
     this.openEditItemDialog();
