@@ -46,19 +46,6 @@ export class DashboardComponent implements OnInit {
       }
     };
 
-
     this.items$ = this.dashboardItemsService.items$;
-  }
-
-  onItemDeleted(item: DashboardItem) {
-    this.removeItem(item);
-  }
-
-  removeItem(item: DashboardItem) {
-    this.dashboardItemsService.removeItem(item);
-  }
-
-  addItem(item: DashboardItem) {
-    this.dashboardItemsService.addItem(item);
   }
 }

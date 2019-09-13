@@ -1,7 +1,6 @@
 <div class="hui-dashboard-item hui-dashboard-item-type-{{item.type}} hui-dashboard-item-size-{{item.size$ | async}}" [ngSwitch]="item.type">
   <div class="hui-dashboard-item-actions">
     <mat-icon aria-hidden="false" aria-label="edit item" color="accent" [routerLink]="['edit-item', item.id]">edit</mat-icon>
-    <mat-icon aria-hidden="false" aria-label="Example home icon" color="accent" (click)="deleteItem($event, item)" (mousedown)="mouseDown($event)">delete</mat-icon>
   </div>
   <ng-container *ngSwitchCase="'value'">
     <div class="hui-dashboard-item-type-{{item.type}}-inner">

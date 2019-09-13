@@ -19,10 +19,10 @@
 </div>
 
 <div mat-dialog-actions>
-  <button mat-button (click)="onCloseClick()" color="accent">Cancel</button>
-  <button mat-button [mat-dialog-close]="data" cdkFocusInitial color="accent">Save item</button>
-  <button mat-button aria-hidden="false" aria-label="Example home icon" color="accent">
+  <button mat-button aria-hidden="false" aria-label="Delete item" color="accent" (click)="onDeleteClick()" class="hui-dashboard-edit-item-dialog-delete-button">
     <mat-icon>delete</mat-icon>
     Delete item
   </button>
+  <button mat-button aria-hidden="false" aria-label="Cancel" (click)="onCloseClick()" color="accent">Cancel</button>
+  <button mat-button aria-hidden="false" aria-label="Save item" [mat-dialog-close]="data" cdkFocusInitial color="accent">Save item</button>
 </div>

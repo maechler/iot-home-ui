@@ -60,16 +60,4 @@ export class DashboardItemComponent {
 
   @Input()
   private item: DashboardItem;
-
-  @Output()
-  delete = new EventEmitter<DashboardItem>();
-
-  deleteItem($event, item: DashboardItem) {
-    this.delete.emit(item);
-  }
-
-  mouseDown($event) {
-    // Prevent gridster preview from showing up
-    $event.stopPropagation();
-  }
 }
