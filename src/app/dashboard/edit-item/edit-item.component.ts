@@ -1,12 +1,12 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {DashboardItem} from '../dashboard-item/dashboard-item';
+import {DashboardItem, DashboardItemColors} from '../dashboard-item/dashboard-item';
 import {DashboardItemsService} from '../dashboard-items.service';
 
 export interface EditItemData {
   duration: string;
   size: string;
-  color: string;
+  color: DashboardItemColors;
   item: DashboardItem;
 }
 
@@ -18,7 +18,7 @@ export interface EditItemData {
 export class EditItemComponent {
   sizes = DashboardItem.sizes;
   durations = DashboardItem.durations;
-  colors = ['red', 'green', 'blue', 'yellow'];
+  colors = Object.keys(DashboardItem.colors);
 
   constructor(public dialogRef: MatDialogRef<EditItemComponent>, @Inject(MAT_DIALOG_DATA) public data: EditItemData, private dashboardItemsService: DashboardItemsService) {}
 

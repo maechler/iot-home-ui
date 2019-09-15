@@ -40,6 +40,7 @@ export class EditItemEntryComponent {
 
         item.setDuration(result.duration);
         item.setSize(result.size);
+        item.setColor(result.color);
 
         this.dashboardItemsService.storeItems();
       }

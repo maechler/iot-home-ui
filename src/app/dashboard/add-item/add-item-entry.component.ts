@@ -45,7 +45,7 @@ export class AddItemEntryComponent {
       this.router.navigate(['../'], { relativeTo: this.route });
 
       if (result) {
-        this.dashboardItemsService.addItem(this.dashboardItemsService.createItem(result.selectedUnit$.getValue(), result.selectedSensor, result.size, result.type));
+        this.dashboardItemsService.addItem(this.dashboardItemsService.createItem(result.selectedUnit$.getValue(), result.selectedSensor, result.size, result.type, undefined, result.color));
       }
     });
   }

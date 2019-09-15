@@ -11,6 +11,13 @@ export interface DashboardItemPosition {
   y: number;
 }
 
+export enum DashboardItemColors {
+  Yellow = 'yellow',
+  Blue = 'blue',
+  Red = 'red',
+  Green = 'green',
+}
+
 export class DashboardItem implements GridsterItem {
   // TODO change to enums
   public static sizes = ['1x1', '2x2', '1x2', '1x3', '1x4'];
@@ -22,6 +29,41 @@ export class DashboardItem implements GridsterItem {
     pressure: 'Pa',
     earth: 'mg/L',
     light: 'lux',
+  };
+
+  public static colors = {
+    yellow: {
+      backgroundColor: 'rgba(242,196,48,0.5)',
+      borderColor: 'rgba(242,196,48,0.5)',
+      pointBackgroundColor: 'rgba(242,196,48,0.5)',
+      pointBorderColor: 'rgba(242,196,48,0.75)',
+      pointHoverBackgroundColor: 'rgba(242,196,48,0.75)',
+      pointHoverBorderColor: 'rgba(242,196,48,0.75)',
+    },
+    blue: {
+      backgroundColor: 'rgba(42,99,140,0.5)',
+      borderColor: 'rgba(42,99,140,0.5)',
+      pointBackgroundColor: 'rgba(42,99,140,0.5)',
+      pointBorderColor: 'rgba(42,99,140,0.75)',
+      pointHoverBackgroundColor: 'rgba(42,99,140,0.75)',
+      pointHoverBorderColor: 'rgba(42,99,140,0.75)',
+    },
+    red: {
+      backgroundColor: 'rgba(208,20,49,0.5)',
+      borderColor: 'rgba(208,20,49,0.5)',
+      pointBackgroundColor: 'rgba(208,20,49,0.5)',
+      pointBorderColor: 'rgba(208,20,49,0.75)',
+      pointHoverBackgroundColor: 'rgba(208,20,49,0.75)',
+      pointHoverBorderColor: 'rgba(208,20,49,0.75)',
+    },
+    green: {
+      backgroundColor: 'rgba(93,182,77,0.5)',
+      borderColor: 'rgba(93,182,77,0.5)',
+      pointBackgroundColor: 'rgba(93,182,77,0.5)',
+      pointBorderColor: 'rgba(93,182,77,0.75)',
+      pointHoverBackgroundColor: 'rgba(93,182,77,0.75)',
+      pointHoverBorderColor: 'rgba(93,182,77,0.75)',
+    },
   };
 
   cols = 1;
@@ -40,13 +82,14 @@ export class DashboardItem implements GridsterItem {
   series: ChartDataSets[];
   labels: Array<Date>;
   duration$ = new BehaviorSubject('7d');
+  color$ = new BehaviorSubject(DashboardItemColors.Yellow);
 
   public constructor(public unit: string, public sensor: string, private sensorService: SensorService, size?: string, public type = 'value', public id?: string) {
     if (size) {
       this.setSize(size);
     }
 
-    this.series = [{data: [], label: unit + '-' + sensor}];
+    this.series = [{data: [], label: sensor + ' - ' + unit}];
 
     if (!id) {
       this.id = uuid.v4();
@@ -58,7 +101,11 @@ export class DashboardItem implements GridsterItem {
         this.series$.subscribe((measurements) => {
           if (measurements) {
             this.labels = measurements.map(measurement => measurement.time);
-            this.series = [{data: measurements.map(measurement => ({t: measurement.time, y: measurement.value})), label: unit + '-' + sensor}];
+            this.series = [{
+              ...DashboardItem.colors[this.color$.getValue()],
+              data: measurements.map(measurement => ({t: measurement.time, y: measurement.value})),
+              label: sensor + ' - ' + unit,
+            }];
           }
         });
         break;
@@ -94,8 +141,12 @@ export class DashboardItem implements GridsterItem {
     return {x: this.x, y: this.y};
   }
 
-  public setPosition(newPosition: DashboardItemPosition) {
-    this.x = newPosition.x;
-    this.y = newPosition.y;
+  public setPosition(position: DashboardItemPosition) {
+    this.x = position.x;
+    this.y = position.y;
+  }
+
+  public setColor(color: DashboardItemColors) {
+    this.color$.next(color);
   }
 }

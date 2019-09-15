@@ -20,6 +20,11 @@
       <mat-option value="{{size}}" *ngFor="let size of sizes">{{size}}</mat-option>
     </mat-select>
   </mat-form-field>
+  <mat-form-field *ngIf="data.type === 'chart'">
+    <mat-select placeholder="Color" [(ngModel)]="data.color">
+      <mat-option value="{{color}}" *ngFor="let color of colors">{{color}}</mat-option>
+    </mat-select>
+  </mat-form-field>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onCloseClick()" color="accent">Cancel</button>

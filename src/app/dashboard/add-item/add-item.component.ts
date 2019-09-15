@@ -7,6 +7,7 @@ export interface AddItemData {
   selectedUnit: string;
   size: string;
   type: string;
+  color: string;
 }
 
 @Component({
@@ -17,6 +18,7 @@ export interface AddItemData {
 export class AddItemComponent {
   types = DashboardItem.types;
   sizes = DashboardItem.sizes;
+  colors = Object.keys(DashboardItem.colors);
 
   constructor(public dialogRef: MatDialogRef<AddItemComponent>, @Inject(MAT_DIALOG_DATA) public data: AddItemData) {}
 

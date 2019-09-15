@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {DashboardItem} from './dashboard-item/dashboard-item';
+import {DashboardItem, DashboardItemColors} from './dashboard-item/dashboard-item';
 import {BehaviorSubject} from 'rxjs';
 import {SensorService} from '../shared/sensor/sensor.service';
 
@@ -47,8 +47,14 @@ export class DashboardItemsService {
     return null;
   }
 
-  createItem(unit: string, sensor: string, size?: string, type?: string, id?: string): DashboardItem {
-    return new DashboardItem(unit, sensor, this.sensorService, size, type, id);
+  createItem(unit: string, sensor: string, size?: string, type?: string, id?: string, color?: DashboardItemColors): DashboardItem {
+    const item = new DashboardItem(unit, sensor, this.sensorService, size, type, id);
+
+    if (color) {
+      item.setColor(color);
+    }
+
+    return item;
   }
 
   private readItemsFromStore() {
@@ -58,7 +64,7 @@ export class DashboardItemsService {
       const storedItems = JSON.parse(storageItems);
 
       const items = storedItems.map((item) => {
-        const dashboardItem = this.createItem(item.unit, item.sensor, item.size, item.type, item.id);
+        const dashboardItem = this.createItem(item.unit, item.sensor, item.size, item.type, item.id, item.color);
 
         dashboardItem.setPosition(item.position);
 
@@ -78,6 +84,7 @@ export class DashboardItemsService {
         unit: item.unit,
         sensor: item.sensor,
         position: item.getPosition(),
+        color: item.color$.getValue(),
       };
     });
 
