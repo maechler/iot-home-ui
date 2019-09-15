@@ -26,7 +26,7 @@ export class EditItemEntryComponent {
       width: '500px',
       data: {
         item: item,
-        color: 'yellow',
+        color: item.color$.getValue(),
         size: item ? item.size$.getValue() : '1x1',
         duration: item ? item.duration$.getValue() : '7d',
       }
