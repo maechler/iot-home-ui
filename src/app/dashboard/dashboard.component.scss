@@ -1,4 +1,5 @@
 @import "~src/sass/_variables.scss";
+@import '~@angular/flex-layout/mq';
 
 :host {
   flex: 1;
@@ -8,6 +9,12 @@
 
 .hui-dashboard-toolbar-buttons {
   text-align: right;
+
+  @include layout-bp(xs) {
+    .hui-dashboard-toolbar-buttons-text {
+      display: none;
+    }
+  }
 }
 
 .hui-dashboard-no-items {
