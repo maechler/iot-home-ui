@@ -73,7 +73,7 @@ export class SensorService {
       this._httpClient.get<Unit[]>(this._influxdbServer + '/query', {
         params: {
           db: this._influxdbDatabase,
-          q: 'SELECT ' + sensor + ' FROM ' + unit + ' WHERE time > now() - ' + duration$.getValue(),
+          q: 'SELECT MEAN(' + sensor + ') FROM ' + unit + ' WHERE time > now() - ' + duration$.getValue() + ' GROUP BY time(' + this.durationToGroupByTime(duration$.getValue()) + ')',
         }
       }).pipe(
         map((response: any) => response.results[0].series[0].values.map((value) => ({value: value[1], time: new Date(value[0])}))),
@@ -169,5 +169,32 @@ export class SensorService {
       clearTimeout(sensor.timeout);
       this.fetchValue(sensor.unit, sensor.sensor);
     });
+  }
+
+  private durationToGroupByTime(duration: string): string {
+    switch (duration) {
+      case '365d':
+      case '180d':
+        return '1d';
+      case '30d':
+        return '12h';
+      case '14d':
+        return '4h';
+      case '7d':
+        return '2h';
+      case '1d':
+        return '30m';
+      case '12h':
+        return '15m';
+      case '4h':
+        return '5m';
+      case '60m':
+      case '30m':
+        return '30s';
+      case '15m':
+        return '10s';
+      default:
+        return '10s';
+    }
   }
 }
