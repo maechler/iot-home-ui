@@ -36,8 +36,6 @@ export class EditItemEntryComponent {
       this.router.navigate(['../../'], { relativeTo: this.route });
 
       if (result) {
-        const item = this.dashboardItemsService.getItemById(this.itemId);
-
         item.setDuration(result.duration);
         item.setSize(result.size);
         item.setColor(result.color);

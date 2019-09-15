@@ -149,4 +149,16 @@ export class DashboardItem implements GridsterItem {
   public setColor(color: DashboardItemColors) {
     this.color$.next(color);
   }
+
+  public serialize() {
+    return {
+      id: this.id,
+      size: this.size$.getValue(),
+      type: this.type,
+      unit: this.unit,
+      sensor: this.sensor,
+      position: this.getPosition(),
+      color: this.color$.getValue(),
+    };
+  }
 }

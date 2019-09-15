@@ -76,17 +76,7 @@ export class DashboardItemsService {
   }
 
   public storeItems() {
-    const storeItems = this.getItems().map((item) => {
-      return {
-        id: item.id,
-        size: item.size$.getValue(),
-        type: item.type,
-        unit: item.unit,
-        sensor: item.sensor,
-        position: item.getPosition(),
-        color: item.color$.getValue(),
-      };
-    });
+    const storeItems = this.getItems().map((item) => item.serialize());
 
     localStorage.setItem(this.settingsStorageKey, JSON.stringify(storeItems));
   }
