@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+echo "Pushing docker tag latest"
+
+docker push marmaechler/iot-home-ui:latest
+
+if [ "$1" ]; then
+  echo "Pushing docker tag $1"
+
+  docker tag marmaechler/iot-home-ui:latest "marmaechler/iot-home-ui:$1"
+  docker push "marmaechler/iot-home-ui:$1"
+fi
