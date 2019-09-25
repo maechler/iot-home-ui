@@ -17,6 +17,10 @@ export class DashboardComponent implements OnInit {
 
   itemChange() {
     this.dashboardItemsService.storeItems();
+
+    setTimeout(() => {
+      this.options.api.optionsChanged();
+    });
   }
 
   constructor(private httpClient: HttpClient, private sensorService: SensorService, private dashboardItemsService: DashboardItemsService) {}

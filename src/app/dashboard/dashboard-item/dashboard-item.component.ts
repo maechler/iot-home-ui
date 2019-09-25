@@ -1,34 +1,39 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {DashboardItem} from './dashboard-item';
+import {Component, EventEmitter, HostBinding, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {DashboardItem, DashboardItemType} from './dashboard-item';
+import {Sensor} from '../../shared/sensor/sensor';
 
 @Component({
   selector: 'hui-dashboard-item',
   templateUrl: './dashboard-item.component.html',
-  styleUrls: ['./dashboard-item.component.scss']
+  styleUrls: ['./dashboard-item.component.scss'],
 })
-export class DashboardItemComponent implements OnInit {
-  sensorUnits = DashboardItem.sensorUnits;
-  lineChartOptions = {};
+export class DashboardItemComponent implements OnInit, OnDestroy {
+  sensorUnits = Sensor.sensorUnits;
+  DashboardItemType = DashboardItemType;
 
   @Input()
-  private item: DashboardItem;
+  item: DashboardItem;
+
+  @Output()
+  itemChange = new EventEmitter();
+
+  @Input() class = '';
+  @HostBinding('class')
+  get hostClasses(): string {
+    return [
+      this.class,
+      this.item ? 'hui-dashboard-item-size-' + this.item.size$.getValue() : '',
+    ].join(' ');
+  }
 
   ngOnInit(): void {
-    this.lineChartOptions = {
-      responsive: true,
-      animation: false,
-      maintainAspectRatio: false,
-      scales: {
-        xAxes: [{
-          type: 'time',
-        }],
-        yAxes: [{
-          scaleLabel: {
-            display: true,
-            labelString: '[' + DashboardItem.sensorUnits[this.item.sensor] + ']'
-          }
-        }]
-      }
-    };
+    this.item.onComponentInit();
+    this.item.size$.subscribe(() => {
+      this.itemChange.emit(this.item);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.item.onComponentDestroy();
   }
 }

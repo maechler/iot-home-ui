@@ -1,59 +1,35 @@
 @import "~src/sass/_variables.scss";
 
 :host {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.hui-dashboard-item {
   padding: $hui-base-space;
   display: flex;
   flex-direction: column;
   flex: 1;
 
+  .hui-dashboard-item-inner {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
   .hui-dashboard-item-actions {
+    display: none;
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     text-align: right;
     padding: $hui-base-space;
+    z-index: 100;
 
     mat-icon {
       cursor: pointer;
     }
   }
+}
 
-  &.hui-dashboard-item-type-value {
-    position: relative;
-    height: 100%;
-    text-align: center;
-
-    .hui-dashboard-item-type-value-inner {
-      position: absolute;
-      top: 50%;
-      width: calc(100% - 2 * #{$hui-base-space});
-      transform: translateY(-50%);
-
-      .hui-dashboard-item-value {
-        font-size: 48px;
-        line-height:  48px;
-      }
-      .hui-dashboard-item-label-sensor {
-        font-weight: bold;
-        font-size: 1rem;
-        padding: $hui-base-space 0 $hui-base-space/2 0;
-      }
-    }
-
-    &.hui-dashboard-item-size-2x2 {
-      .hui-dashboard-item-type-value-inner {
-        .hui-dashboard-item-value {
-          font-size: 120px;
-          line-height:  120px;
-        }
-      }
-    }
+:host:hover {
+  .hui-dashboard-item-actions {
+    display: block;
   }
 }

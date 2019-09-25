@@ -5,13 +5,13 @@
 @import 'theme';
 @import "../app/page-not-found/theme";
 @import "../app/dashboard/theme";
-@import "../app/dashboard/dashboard-item/theme";
+@import "../app/dashboard/dashboard-item/value-dashboard-item/theme";
 
 @include angular-material-theme($hui-theme);
 @include hui-app-theme($hui-theme);
 @include hui-page-not-found-theme($hui-theme);
 @include hui-dashboard-theme($hui-theme);
-@include hui-dashboard-item-theme($hui-theme);
+@include hui-dashboard-item-value-theme($hui-theme);
 
 html, body {
   height: 100%;

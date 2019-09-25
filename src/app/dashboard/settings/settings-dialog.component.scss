@@ -1,5 +1,13 @@
+@import "~src/sass/_variables.scss";
+
 .hui-dashboard-settings-dialog-form-fields {
   * {
+    width: 100%;
+  }
+}
+
+mat-dialog-actions {
+  button {
     width: 100%;
   }
 }

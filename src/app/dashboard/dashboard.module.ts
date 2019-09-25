@@ -8,11 +8,12 @@ import {DashboardComponent} from './dashboard.component';
 import {DashboardItemComponent} from './dashboard-item/dashboard-item.component';
 import { SettingsDialogComponent } from './settings/settings-dialog.component';
 import { SettingsDialogEntryComponent } from './settings/settings-dialog-entry.component';
-import { AddItemComponent } from './add-item/add-item.component';
-import { AddItemEntryComponent } from './add-item/add-item-entry.component';
+import { ItemDialogEntryComponent } from './item-dialog/item-dialog-entry.component';
 import {ChartsModule} from 'ng2-charts';
-import {EditItemComponent} from './edit-item/edit-item.component';
-import {EditItemEntryComponent} from './edit-item/edit-item-entry.component';
+import { ValueDashboardItemComponent } from './dashboard-item/value-dashboard-item/value-dashboard-item.component';
+import { ChartDashboardItemComponent } from './dashboard-item/chart-dashboard-item/chart-dashboard-item.component';
+import {EditItemDialogComponent} from './item-dialog/edit-item-dialog.component';
+import {AddItemDialogComponent} from './item-dialog/add-item-dialog.component';
 
 @NgModule({
   imports: [
@@ -27,11 +28,12 @@ import {EditItemEntryComponent} from './edit-item/edit-item-entry.component';
     DashboardItemComponent,
     SettingsDialogComponent,
     SettingsDialogEntryComponent,
-    AddItemComponent,
-    AddItemEntryComponent,
-    EditItemComponent,
-    EditItemEntryComponent,
+    EditItemDialogComponent,
+    AddItemDialogComponent,
+    ItemDialogEntryComponent,
+    ValueDashboardItemComponent,
+    ChartDashboardItemComponent,
   ],
-  entryComponents: [SettingsDialogComponent, AddItemComponent, EditItemComponent],
+  entryComponents: [SettingsDialogComponent, EditItemDialogComponent, AddItemDialogComponent],
 })
 export class DashboardModule { }

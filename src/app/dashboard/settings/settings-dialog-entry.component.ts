@@ -8,7 +8,12 @@ import {SettingsService} from './settings.service';
   template: '',
 })
 export class SettingsDialogEntryComponent {
-  constructor(public settingsDialog: MatDialog, private router: Router, private route: ActivatedRoute, private settingsService: SettingsService) {
+  constructor(
+    public settingsDialog: MatDialog,
+    private router: Router,
+    private route: ActivatedRoute,
+    private settingsService: SettingsService
+  ) {
     this.openSettingsDialog();
   }
 

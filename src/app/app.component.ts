@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'IoT Home UI';
-  year = (new Date()).getFullYear();
+  readonly year = (new Date()).getFullYear();
 }

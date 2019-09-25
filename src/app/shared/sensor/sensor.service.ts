@@ -4,20 +4,25 @@ import {Sensor} from './sensor';
 import {HttpClient} from '@angular/common/http';
 import {Unit} from './unit';
 import {BehaviorSubject, Observable, of } from 'rxjs';
-import {catchError, map } from 'rxjs/operators';
+import {catchError, map} from 'rxjs/operators';
 import {Measurement} from './measurement';
 import {MatSnackBar} from '@angular/material';
+import {ConfigurationService} from '../configuration/configuration.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SensorService {
-  private _valueObservables = {};
   private _influxdbServer: string;
   private _influxdbDatabase: string;
   private _refreshRate: number;
 
-  constructor(private _settingsService: SettingsService, private _httpClient: HttpClient, private _snackBar: MatSnackBar) {
+  constructor(
+    private _settingsService: SettingsService,
+    private _httpClient: HttpClient,
+    private _snackBar: MatSnackBar,
+    private _configurationService: ConfigurationService,
+  ) {
     _settingsService.settings$.subscribe(this.handleSettingsChanged.bind(this));
     this.updateSettings();
   }
@@ -44,7 +49,7 @@ export class SensorService {
   }
 
   fetchSensorsByUnit(unit?: string): Observable<Sensor[]> {
-    return this._httpClient.get<Unit[]>(this._influxdbServer + '/query', {
+    return this._httpClient.get<Sensor[]>(this._influxdbServer + '/query', {
       params: {
         db: this._influxdbDatabase,
         q: 'SHOW FIELD KEYS FROM ' + unit,
@@ -66,10 +71,10 @@ export class SensorService {
   }
 
   getSeriesObservable(unit: string, sensor: string, duration$: BehaviorSubject<string>): Observable<Measurement[]> {
-    const observable = new BehaviorSubject(null);
+    const seriesSubject = new BehaviorSubject(null);
     let currentTimeout = -1;
 
-    const fetchSeries = (unit, sensor, duration$) => {
+    const fetchSeries = () => {
       this._httpClient.get<Unit[]>(this._influxdbServer + '/query', {
         params: {
           db: this._influxdbDatabase,
@@ -83,67 +88,65 @@ export class SensorService {
           return of({value: 0, time: null});
         })
       ).subscribe((measurements) => {
-        currentTimeout = setTimeout(() => {
-          fetchSeries(unit, sensor, duration$);
-        }, this._refreshRate * 1000);
+        seriesSubject.next(measurements);
 
-        observable.next(measurements);
+        if (seriesSubject.observers.length > 0) {
+          currentTimeout = setTimeout(fetchSeries, this._refreshRate * 1000);
+        }
       });
     };
 
     duration$.subscribe(() => {
       clearTimeout(currentTimeout);
-      fetchSeries(unit, sensor, duration$);
+      fetchSeries();
     });
 
-    fetchSeries(unit, sensor, duration$);
+    this._settingsService.settings$.subscribe(() => {
+      clearTimeout(currentTimeout);
+      fetchSeries();
+    });
 
-    return observable;
+    fetchSeries();
+
+    return seriesSubject.asObservable();
   }
 
   getValueObservable(unit: string, sensor: string): Observable<Measurement> {
-    if (this._valueObservables[this.getSensorKey(unit, sensor)] === undefined) {
-      this._valueObservables[this.getSensorKey(unit, sensor)] = {
-        unit: unit,
-        sensor: sensor,
-        observable: new BehaviorSubject(null),
-        timeout: -1,
-      };
+    const valueSubject = new BehaviorSubject(null);
+    let currentTimeout = -1;
 
-      this.fetchValue(unit, sensor);
-    }
+    const  fetchValue = () => {
+      this._httpClient.get<Unit[]>(this._influxdbServer + '/query', {
+        params: {
+          db: this._influxdbDatabase,
+          q: 'SELECT ' + sensor + ' FROM ' + unit + ' ORDER BY DESC LIMIT 1 ',
+        }
+      }).pipe(
+        map((response: any) => ({
+          value: response.results[0].series[0].values[0][1],
+          time: new Date(response.results[0].series[0].values[0][0])
+        })),
+        catchError( error => {
+          this.handleError(error);
+          return of({value: 0, time: null});
+        })
+      ).subscribe((measurement) => {
+        valueSubject.next(measurement);
 
-    return this._valueObservables[this.getSensorKey(unit, sensor)].observable;
-  }
+        if (valueSubject.observers.length > 0) {
+          currentTimeout = setTimeout(fetchValue, this._refreshRate * 1000);
+        }
+      });
+    };
 
-   private fetchValue(unit, sensor) {
-     const activeSensor = this._valueObservables[this.getSensorKey(unit, sensor)];
+    this._settingsService.settings$.subscribe(() => {
+      clearTimeout(currentTimeout);
+      fetchValue();
+    });
 
-     this._httpClient.get<Unit[]>(this._influxdbServer + '/query', {
-       params: {
-         db: this._influxdbDatabase,
-         q: 'SELECT ' + sensor + ' FROM ' + unit + ' ORDER BY DESC LIMIT 1 ',
-       }
-     }).pipe(
-       map((response: any) => ({
-         value: response.results[0].series[0].values[0][1],
-         time: new Date(response.results[0].series[0].values[0][0])
-       })),
-       catchError( error => {
-         this.handleError(error);
-         return of({value: 0, time: null});
-       })
-     ).subscribe((measurement) => {
-       this._valueObservables[this.getSensorKey(unit, sensor)].timeout = setTimeout(() => {
-         this.fetchValue(unit, sensor);
-       }, this._refreshRate * 1000);
+    fetchValue();
 
-       activeSensor.observable.next(measurement);
-     });
-  }
-
-  private getSensorKey(unit, sensor, duration?) {
-    return unit + '-' + sensor + (duration ? '-' + duration : '');
+    return valueSubject.asObservable();
   }
 
   private updateSettings() {
@@ -156,19 +159,12 @@ export class SensorService {
     console.error(error);
 
     this._snackBar.open('An error happened reading from InfluxDB.', 'OK', {
-      duration: 5000,
+      duration: this._configurationService.defaultSnackBarDuration$.getValue(),
     });
   }
 
   private handleSettingsChanged() {
     this.updateSettings();
-
-    Object.keys(this._valueObservables).forEach(key => {
-      const sensor = this._valueObservables[key];
-
-      clearTimeout(sensor.timeout);
-      this.fetchValue(sensor.unit, sensor.sensor);
-    });
   }
 
   private durationToGroupByTime(duration: string): string {
@@ -189,6 +185,7 @@ export class SensorService {
       case '4h':
         return '5m';
       case '60m':
+        return '1m';
       case '30m':
         return '30s';
       case '15m':

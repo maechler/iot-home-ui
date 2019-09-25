@@ -17,7 +17,7 @@
 <ng-container *ngIf="(items$ | async)?.length">
   <gridster [options]="options">
     <gridster-item [item]="item" *ngFor="let item of items$ | async">
-      <hui-dashboard-item [item]="item"></hui-dashboard-item>
+      <hui-dashboard-item [item]="item" (itemChange)="itemChange()"></hui-dashboard-item>
     </gridster-item>
   </gridster>
 </ng-container>

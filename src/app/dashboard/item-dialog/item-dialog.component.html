@@ -1,0 +1,116 @@
+<h2 mat-dialog-title>{{title}}</h2>
+
+<mat-dialog-content>
+  <form fxLayout="row wrap" fxLayoutGap="12px grid" [formGroup]="itemDialogForm">
+    <mat-form-field fxFlex="100%" *ngIf="dialogType === ItemDialogType.Add">
+      <mat-select placeholder="Type" formControlName="type">
+        <mat-option value="{{type}}" *ngFor="let type of types">{{type}}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="type.hasError('required')">Type is <strong>required</strong>.</mat-error>
+    </mat-form-field>
+
+    <ng-container *ngIf="type.value === DashboardItemType.Value">
+      <mat-form-field fxFlex="100%">
+        <mat-select placeholder="Size" formControlName="size">
+          <mat-option value="{{size}}" *ngFor="let size of sizes">{{size}}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="size.hasError('required')">Size is <strong>required</strong>.</mat-error>
+      </mat-form-field>
+      <mat-form-field fxFlex="50%">
+        <mat-select placeholder="Unit" formControlName="unit">
+          <mat-option value="{{unit.name}}" *ngFor="let unit of units$ | async">{{unit.name}}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="unit.hasError('required')">Unit is <strong>required</strong>.</mat-error>
+      </mat-form-field>
+      <mat-form-field fxFlex="50%">
+        <mat-select placeholder="Sensor" formControlName="sensor">
+          <mat-option value="{{sensor.name}}" *ngFor="let sensor of sensors$ | async">{{sensor.name}}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="sensor.hasError('required')">Sensor is <strong>required</strong>.</mat-error>
+      </mat-form-field>
+    </ng-container>
+
+    <ng-container *ngIf="type.value === DashboardItemType.Chart">
+      <mat-form-field fxFlex="100%">
+        <mat-select placeholder="Size" formControlName="size">
+          <mat-option value="{{size}}" *ngFor="let size of sizes">{{size}}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="size.hasError('required')">Size is <strong>required</strong>.</mat-error>
+      </mat-form-field>
+      <mat-form-field fxFlex="100%">
+        <mat-select placeholder="Duration" formControlName="duration">
+          <mat-option value="{{duration}}" *ngFor="let duration of durations">{{duration}}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="duration.hasError('required')">Duration is <strong>required</strong>.</mat-error>
+      </mat-form-field>
+      <div fxFlex="100%">
+        <h3>Add Series</h3>
+      </div>
+      <mat-form-field fxFlex="30%">
+        <mat-select placeholder="Unit" formControlName="unit">
+          <mat-option value="{{unit.name}}" *ngFor="let unit of units$ | async">{{unit.name}}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="unit.hasError('required')">Unit is <strong>required</strong>.</mat-error>
+      </mat-form-field>
+      <mat-form-field fxFlex="30%">
+        <mat-select placeholder="Sensor" formControlName="sensor">
+          <mat-option value="{{sensor.name}}" *ngFor="let sensor of sensors$ | async">{{sensor.name}}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="sensor.hasError('required')">Sensor is <strong>required</strong>.</mat-error>
+      </mat-form-field>
+      <mat-form-field fxFlex="30%">
+        <mat-select placeholder="Color" formControlName="color">
+          <mat-option value="{{color}}" *ngFor="let color of colors">{{color}}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="color.hasError('required')">Color is <strong>required</strong>.</mat-error>
+      </mat-form-field>
+      <div fxFlex="10%" class="hui-dashboard-item-dialog-add-series">
+        <mat-icon (click)="addSeries()" color="accent">add</mat-icon>
+      </div>
+      <div fxFlex="100%">
+        <div *ngIf="series.length === 0">No series yet added.</div>
+      </div>
+
+      <div fxFlex="100%">
+        <div class="hui-dashboard-item-dialog-series" fxLayout="row wrap" fxLayoutGap="12px grid" >
+          <ng-container *ngFor="let s of series">
+            <div fxFlex="30%">{{s.unit}}</div>
+            <div fxFlex="30%">{{s.sensor}}</div>
+            <div fxFlex="30%">{{s.color}}</div>
+            <mat-icon fxFlex="10%" (click)="removeSeries(s)" color="accent" class="hui-dashboard-item-dialog-delete-series">delete</mat-icon>
+          </ng-container>
+        </div>
+        <mat-error *ngIf="showSeriesError">You must add at least one series.</mat-error>
+      </div>
+    </ng-container>
+  </form>
+</mat-dialog-content>
+
+<ng-container *ngIf="dialogType === ItemDialogType.Edit">
+  <mat-dialog-actions fxLayout="wrap" fxLayoutGap="12px grid">
+    <div fxFlex="30%">
+      <button mat-raised-button (click)="onDeleteClick()">
+        <mat-icon>delete</mat-icon>
+        Delete item
+      </button>
+    </div>
+    <div fxFlex="30%">
+      <button mat-raised-button (click)="onCloseClick()">Cancel</button>
+    </div>
+    <div fxFlex="40%">
+      <button mat-raised-button (click)="onFormSubmitClick()" color="primary">{{submitButtonText}}</button>
+    </div>
+  </mat-dialog-actions>
+</ng-container>
+
+<ng-container *ngIf="dialogType === ItemDialogType.Add">
+  <mat-dialog-actions fxLayout="wrap" fxLayoutGap="12px grid">
+    <div fxFlex="50%">
+      <button mat-raised-button (click)="onCloseClick()">Cancel</button>
+    </div>
+    <div fxFlex="50%">
+      <button mat-raised-button (click)="onFormSubmitClick()" color="primary">{{submitButtonText}}</button>
+    </div>
+  </mat-dialog-actions>
+</ng-container>
+

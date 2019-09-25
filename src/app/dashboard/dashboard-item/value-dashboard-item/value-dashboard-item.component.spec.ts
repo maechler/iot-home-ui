@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddItemComponent } from './add-item.component';
+import { ValueDashboardItemComponent } from './value-dashboard-item.component';
 
-describe('AddDashboardItemComponent', () => {
-  let component: AddItemComponent;
-  let fixture: ComponentFixture<AddItemComponent>;
+describe('ValueDashboardItemComponent', () => {
+  let component: ValueDashboardItemComponent;
+  let fixture: ComponentFixture<ValueDashboardItemComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AddItemComponent ]
+      declarations: [ ValueDashboardItemComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AddItemComponent);
+    fixture = TestBed.createComponent(ValueDashboardItemComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EditItemComponent } from './edit-item.component';
+import { ChartDashboardItemComponent } from './chart-dashboard-item.component';
 
-describe('AddDashboardItemComponent', () => {
-  let component: EditItemComponent;
-  let fixture: ComponentFixture<EditItemComponent>;
+describe('ChartDashboardItemComponent', () => {
+  let component: ChartDashboardItemComponent;
+  let fixture: ComponentFixture<ChartDashboardItemComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EditItemComponent ]
+      declarations: [ ChartDashboardItemComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EditItemComponent);
+    fixture = TestBed.createComponent(ChartDashboardItemComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

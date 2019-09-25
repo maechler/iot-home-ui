@@ -8,10 +8,10 @@ import {
   MatIconModule,
   MatInputModule,
   MatSelectModule,
-  MatSnackBarModule,
+  MatSnackBarModule, MatTableModule,
   MatToolbarModule
 } from '@angular/material';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
   imports: [
@@ -26,6 +26,8 @@ import {FormsModule} from '@angular/forms';
     MatInputModule,
     MatSelectModule,
     MatSnackBarModule,
+    MatTableModule,
+    ReactiveFormsModule,
   ],
   exports: [
     FlexLayoutModule,
@@ -38,6 +40,8 @@ import {FormsModule} from '@angular/forms';
     MatInputModule,
     MatSelectModule,
     MatSnackBarModule,
+    MatTableModule,
+    ReactiveFormsModule,
   ],
   declarations: []
 })

@@ -1,6 +1,6 @@
-@import '~@angular/material/theming';
+@import '../../../../../node_modules/@angular/material/theming';
 
-@mixin hui-dashboard-item-theme($theme) {
+@mixin hui-dashboard-item-value-theme($theme) {
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
   $warn: map-get($theme, accent);

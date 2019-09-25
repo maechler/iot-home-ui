@@ -1,33 +1,13 @@
-<div class="hui-dashboard-item hui-dashboard-item-type-{{item.type}} hui-dashboard-item-size-{{item.size$ | async}}" [ngSwitch]="item.type">
+<ng-container [ngSwitch]="item.type">
   <div class="hui-dashboard-item-actions">
     <mat-icon aria-hidden="false" aria-label="edit item" color="accent" [routerLink]="['edit-item', item.id]">edit</mat-icon>
   </div>
-  <ng-container *ngSwitchCase="'value'">
-    <div class="hui-dashboard-item-type-{{item.type}}-inner">
-      <ng-container *ngIf="item.value$ | async; then valueAvailable; else noValueAvailable"></ng-container>
-      <ng-template #valueAvailable>
-        <div class="hui-dashboard-item-value">
-          {{(item.value$ | async).value | number : '1.1-1'}}
-        </div>
-        <div class="hui-dashboard-item-label-sensor">{{item.sensor}} [{{sensorUnits[item.sensor]}}]</div>
-        <div class="hui-dashboard-item-label-unit">{{item.unit}}</div>
-        <div class="hui-dashboard-item-label-date">{{(item.value$ | async).time | date : 'medium'}}</div>
-      </ng-template>
-      <ng-template #noValueAvailable>
-        <div class="hui-dashboard-item-value">?</div>
-        <div class="hui-dashboard-item-label-sensor">{{item.sensor}} [{{sensorUnits[item.sensor]}}]</div>
-        <div class="hui-dashboard-item-label-unit">{{item.unit}}</div>
-        <div class="hui-dashboard-item-label-date"></div>
-      </ng-template>
-    </div>
-  </ng-container>
-  <ng-container *ngSwitchCase="'chart'">
-    <canvas baseChart width="100%" height="100%"
-            [labels]="item.labels"
-            [datasets]="item.series"
-            [options]="lineChartOptions"
-            [legend]="true"
-            [chartType]="'line'">
-    </canvas>
-  </ng-container>
-</div>
+  <div class="hui-dashboard-item-inner">
+    <ng-container *ngSwitchCase="DashboardItemType.Value">
+      <hui-value-dashboard-item [item]="item"></hui-value-dashboard-item>
+    </ng-container>
+    <ng-container *ngSwitchCase="DashboardItemType.Chart">
+      <hui-chart-dashboard-item [item]="item"></hui-chart-dashboard-item>
+    </ng-container>
+  </div>
+</ng-container>

@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import {DashboardItem, DashboardItemColors} from './dashboard-item/dashboard-item';
+import {DashboardItem, DashboardItemType, SerializedDashboardItem} from './dashboard-item/dashboard-item';
 import {BehaviorSubject} from 'rxjs';
 import {SensorService} from '../shared/sensor/sensor.service';
+import {SerializedValueDashboardItem, ValueDashboardItem} from './dashboard-item/value-dashboard-item/value-dashboard-item';
+import {ChartDashboardItem, SerializedChartDashboardItem} from './dashboard-item/chart-dashboard-item/chart-dashboard-item';
 
 @Injectable({
   providedIn: 'root'
@@ -47,11 +49,36 @@ export class DashboardItemsService {
     return null;
   }
 
-  createItem(unit: string, sensor: string, size?: string, type?: string, id?: string, color?: DashboardItemColors): DashboardItem {
-    const item = new DashboardItem(unit, sensor, this.sensorService, size, type, id);
+  createItem(serializedDashboardItem: SerializedDashboardItem): DashboardItem {
+    let item: DashboardItem;
 
-    if (color) {
-      item.setColor(color);
+    switch (serializedDashboardItem.type) {
+      case DashboardItemType.Value:
+        const valueItem = new ValueDashboardItem(serializedDashboardItem.id) as ValueDashboardItem;
+        const serializedValueDashboardItem = serializedDashboardItem as SerializedValueDashboardItem;
+
+        valueItem.unit = serializedValueDashboardItem.unit;
+        valueItem.sensor = serializedValueDashboardItem.sensor;
+
+        item = valueItem;
+        break;
+      case DashboardItemType.Chart:
+        const chartItem = new ChartDashboardItem(serializedDashboardItem.id);
+        const serializedChartDashboardItem = serializedDashboardItem as SerializedChartDashboardItem;
+
+        chartItem.setDuration(serializedChartDashboardItem.duration)
+                 .setSeries(serializedChartDashboardItem.series);
+
+        item = chartItem;
+        break;
+      default:
+        item =  null;
+    }
+
+    if (item) {
+      item.setSensorService(this.sensorService)
+          .setSize(serializedDashboardItem.size)
+          .setPosition(serializedDashboardItem.position);
     }
 
     return item;
@@ -62,14 +89,7 @@ export class DashboardItemsService {
 
     if (storageItems) {
       const storedItems = JSON.parse(storageItems);
-
-      const items = storedItems.map((item) => {
-        const dashboardItem = this.createItem(item.unit, item.sensor, item.size, item.type, item.id, item.color);
-
-        dashboardItem.setPosition(item.position);
-
-        return dashboardItem;
-      });
+      const items = storedItems.map(this.createItem.bind(this));
 
       this._items.next(items);
     }
