@@ -7,7 +7,7 @@ import {Sensor} from '../../shared/sensor/sensor';
   templateUrl: './dashboard-item.component.html',
   styleUrls: ['./dashboard-item.component.scss'],
 })
-export class DashboardItemComponent implements OnInit, OnDestroy {
+export class DashboardItemComponent implements OnInit {
   sensorUnits = Sensor.sensorUnits;
   DashboardItemType = DashboardItemType;
 
@@ -27,13 +27,8 @@ export class DashboardItemComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.item.onComponentInit();
     this.item.size$.subscribe(() => {
       this.itemChange.emit(this.item);
     });
-  }
-
-  ngOnDestroy(): void {
-    this.item.onComponentDestroy();
   }
 }

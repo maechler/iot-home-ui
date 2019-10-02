@@ -50,38 +50,34 @@ export class DashboardItemsService {
   }
 
   createItem(serializedDashboardItem: SerializedDashboardItem): DashboardItem {
-    let item: DashboardItem;
-
     switch (serializedDashboardItem.type) {
       case DashboardItemType.Value:
         const valueItem = new ValueDashboardItem(serializedDashboardItem.id) as ValueDashboardItem;
         const serializedValueDashboardItem = serializedDashboardItem as SerializedValueDashboardItem;
 
-        valueItem.unit = serializedValueDashboardItem.unit;
-        valueItem.sensor = serializedValueDashboardItem.sensor;
+        valueItem.setSensorService(this.sensorService)
+          .setSize(serializedDashboardItem.size)
+          .setPosition(serializedDashboardItem.position);
 
-        item = valueItem;
-        break;
+        valueItem.setUnit(serializedValueDashboardItem.unit)
+          .setSensor(serializedValueDashboardItem.sensor);
+
+        return valueItem;
       case DashboardItemType.Chart:
         const chartItem = new ChartDashboardItem(serializedDashboardItem.id);
         const serializedChartDashboardItem = serializedDashboardItem as SerializedChartDashboardItem;
 
-        chartItem.setDuration(serializedChartDashboardItem.duration)
-                 .setSeries(serializedChartDashboardItem.series);
-
-        item = chartItem;
-        break;
-      default:
-        item =  null;
-    }
-
-    if (item) {
-      item.setSensorService(this.sensorService)
+        chartItem.setSensorService(this.sensorService)
           .setSize(serializedDashboardItem.size)
           .setPosition(serializedDashboardItem.position);
+
+        chartItem.setDuration(serializedChartDashboardItem.duration)
+          .setSeries(serializedChartDashboardItem.series);
+
+        return chartItem;
     }
 
-    return item;
+    return null;
   }
 
   private readItemsFromStore() {

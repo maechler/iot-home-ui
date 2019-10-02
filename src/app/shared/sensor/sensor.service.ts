@@ -4,7 +4,7 @@ import {Sensor} from './sensor';
 import {HttpClient} from '@angular/common/http';
 import {Unit} from './unit';
 import {BehaviorSubject, Observable, combineLatest, of, interval, timer} from 'rxjs';
-import {catchError, map, switchMap, startWith, retryWhen, delayWhen, tap} from 'rxjs/operators';
+import {catchError, map, switchMap, startWith, retryWhen, delayWhen, tap, shareReplay} from 'rxjs/operators';
 import {Measurement} from './measurement';
 import {MatSnackBar} from '@angular/material';
 import {ConfigurationService} from '../configuration/configuration.service';
@@ -113,7 +113,11 @@ export class SensorService {
             tap(error => this.handleError(error)),
             delayWhen(val => timer(5000))
           )
-        )
+        ),
+        shareReplay({
+          bufferSize: 1,
+          refCount: true
+        }),
       );
 
       this._seriesObservabels.set(observableKey, seriesObservable);
@@ -157,9 +161,13 @@ export class SensorService {
         retryWhen(errors =>
           errors.pipe(
             tap(error => this.handleError(error)),
-            delayWhen(val => timer(5000))
+            delayWhen(_ => timer(5000))
           )
-        )
+        ),
+        shareReplay({
+          bufferSize: 1,
+          refCount: true
+        }),
       );
 
       this._valueObservabels.set(observableKey, valueObservable);

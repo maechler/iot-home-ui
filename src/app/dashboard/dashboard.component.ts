@@ -45,9 +45,6 @@ export class DashboardComponent implements OnInit {
       draggable: {
         enabled: true,
       },
-      resizable: {
-        enabled: false,
-      }
     };
 
     this.items$ = this.dashboardItemsService.items$;

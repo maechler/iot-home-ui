@@ -1,12 +1,12 @@
-<ng-container *ngIf="item && item.value$ | async; then valueAvailable; else noValueAvailable"></ng-container>
+<ng-container *ngIf="item && (item.measurement$ | async); then valueAvailable; else noValueAvailable"></ng-container>
 
 <ng-template #valueAvailable>
   <div class="hui-dashboard-item-value">
-    {{(item.value$ | async).value | number : '1.1-1'}}
+    {{(item.measurement$ | async).value | number : '1.1-1'}}
   </div>
   <div class="hui-dashboard-item-label-sensor">{{item.sensor}} [{{sensorUnits[item.sensor]}}]</div>
   <div class="hui-dashboard-item-label-unit">{{item.unit}}</div>
-  <div class="hui-dashboard-item-label-date">{{(item.value$ | async).time | date : 'medium'}}</div>
+  <div class="hui-dashboard-item-label-date">{{(item.measurement$ | async).time | date : 'medium'}}</div>
 </ng-template>
 
 <ng-template #noValueAvailable>

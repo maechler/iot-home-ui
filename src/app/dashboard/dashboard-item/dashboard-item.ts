@@ -56,7 +56,6 @@ export abstract class DashboardItem implements GridsterItem {
   size$ = new BehaviorSubject(DashboardItemSize.OneOne);
 
   protected sensorService: SensorService;
-  protected isComponentInitialized = false;
 
   public abstract type: DashboardItemType;
 
@@ -119,13 +118,5 @@ export abstract class DashboardItem implements GridsterItem {
       size: this.size$.getValue(),
       position: this.getPosition(),
     };
-  }
-
-  public onComponentInit() {
-    this.isComponentInitialized = true;
-  }
-
-  public onComponentDestroy() {
-    this.isComponentInitialized = false;
   }
 }

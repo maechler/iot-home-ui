@@ -1,8 +1,8 @@
-<canvas *ngIf="item" baseChart
+<canvas *ngIf="(item$ | async)" baseChart
         width="100%"
         height="100%"
-        [labels]="item.labels"
-        [datasets]="item.chartDataSets"
+        [labels]="(item$ | async).labels"
+        [datasets]="(item$ | async).chartDataSets"
         [options]="lineChartOptions"
         [legend]="true"
         [chartType]="'line'">

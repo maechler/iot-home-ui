@@ -85,21 +85,7 @@ export class ChartDashboardItem extends DashboardItem {
     return this;
   }
 
-  onComponentInit() {
-    super.onComponentInit();
-    this.setSeriesObservable();
-  }
-
-  onComponentDestroy() {
-    super.onComponentDestroy();
-    this._seriesSubscriptions.forEach((seriesSubscription) => seriesSubscription.unsubscribe());
-  }
-
   protected setSeriesObservable() {
-    if (!this.isComponentInitialized) {
-      return;
-    }
-
     this._seriesSubscriptions.forEach((seriesSubscription) => seriesSubscription.unsubscribe());
     this.chartDataSets = [];
 
