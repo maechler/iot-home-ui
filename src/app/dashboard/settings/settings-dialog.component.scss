@@ -1,8 +1,8 @@
 @import "~src/sass/_variables.scss";
 
 .hui-dashboard-settings-dialog-form-fields {
-  * {
-    width: 100%;
+  > div {
+    margin-bottom: 0 !important; // Avoid scroll in mat dialog
   }
 }
 

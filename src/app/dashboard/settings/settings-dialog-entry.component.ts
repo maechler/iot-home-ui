@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {MatDialog} from '@angular/material';
 import {SettingsDialogComponent} from './settings-dialog.component';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -10,9 +10,9 @@ import {SettingsService} from './settings.service';
 export class SettingsDialogEntryComponent {
   constructor(
     public settingsDialog: MatDialog,
-    private router: Router,
-    private route: ActivatedRoute,
-    private settingsService: SettingsService
+    private _router: Router,
+    private _route: ActivatedRoute,
+    private _settingsService: SettingsService
   ) {
     this.openSettingsDialog();
   }
@@ -20,14 +20,14 @@ export class SettingsDialogEntryComponent {
   openSettingsDialog(): void {
     const dialogRef = this.settingsDialog.open(SettingsDialogComponent, {
       width: '500px',
-      data: this.settingsService.getSettings()
+      data: {...this._settingsService.getSettings()},
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      this.router.navigate(['../'], { relativeTo: this.route });
+    dialogRef.afterClosed().subscribe(data => {
+      this._router.navigate(['../'], { relativeTo: this._route });
 
-      if (result) {
-        this.settingsService.setSettings(result);
+      if (data) {
+        this._settingsService.setSettings(data);
       }
     });
   }

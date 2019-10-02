@@ -1,4 +1,4 @@
-<ng-container *ngIf="item.value$ | async; then valueAvailable; else noValueAvailable"></ng-container>
+<ng-container *ngIf="item && item.value$ | async; then valueAvailable; else noValueAvailable"></ng-container>
 
 <ng-template #valueAvailable>
   <div class="hui-dashboard-item-value">

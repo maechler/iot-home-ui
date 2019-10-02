@@ -1,17 +1,25 @@
 <h2 mat-dialog-title>Settings</h2>
 
 <mat-dialog-content class="hui-dashboard-settings-dialog-form-fields">
-  <mat-form-field>
-    <input matInput [(ngModel)]="data.influxdbServer" placeholder="InfluxDB Server">
-  </mat-form-field>
-  <mat-form-field>
-    <input matInput [(ngModel)]="data.influxdbDatabase" placeholder="InfluxDB Database">
-  </mat-form-field>
-  <mat-form-field>
-    <mat-select placeholder="Refresh rate" [(ngModel)]="data.refreshRate">
-      <mat-option *ngFor="let refreshRate of refreshRates" value="{{refreshRate}}">{{refreshRate}}s</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <div fxLayout="row wrap" fxLayoutGap="12px grid">
+    <mat-form-field fxFlex="50%">
+      <input matInput [(ngModel)]="data.influxdbServer" placeholder="InfluxDB Server">
+    </mat-form-field>
+    <mat-form-field fxFlex="50%">
+      <input matInput [(ngModel)]="data.influxdbDatabase" placeholder="InfluxDB Database">
+    </mat-form-field>
+    <mat-form-field fxFlex="50%">
+      <input matInput [(ngModel)]="data.influxdbUsername" placeholder="InfluxDB Username">
+    </mat-form-field>
+    <mat-form-field fxFlex="50%">
+      <input matInput [(ngModel)]="data.influxdbPassword" placeholder="InfluxDB Password">
+    </mat-form-field>
+    <mat-form-field fxFlex="100%">
+      <mat-select placeholder="Refresh rate" [(ngModel)]="data.refreshRate">
+        <mat-option *ngFor="let refreshRate of refreshRates" value="{{refreshRate}}">{{refreshRate}}s</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions fxLayout="wrap" fxLayoutGap="12px grid">
@@ -19,6 +27,6 @@
     <button mat-raised-button (click)="onCloseClick()" >Cancel</button>
   </div>
   <div fxFlex="50%">
-    <button mat-raised-button [mat-dialog-close]="data" color="primary" >Update settings</button>
+    <button mat-raised-button color="primary" (click)="onUpdateClick(data)">Update settings</button>
   </div>
 </mat-dialog-actions>

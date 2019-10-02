@@ -4,7 +4,9 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 export interface Settings {
   influxdbServer: string;
   influxdbDatabase: string;
-  refreshRate: number;
+  influxdbUsername: string;
+  influxdbPassword: string;
+  refreshRate: RefreshRate;
 }
 
 export enum RefreshRate {
@@ -23,9 +25,16 @@ export enum RefreshRate {
 export class SettingsDialogComponent {
   refreshRates = Object.values(RefreshRate).filter((value) => !isNaN(value));
 
-  constructor(public dialogRef: MatDialogRef<SettingsDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: Settings) {}
+  constructor(
+    public _dialogRef: MatDialogRef<SettingsDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: Settings,
+  ) {}
 
   onCloseClick(): void {
-    this.dialogRef.close();
+    this._dialogRef.close();
+  }
+
+  onUpdateClick(data: Settings): void {
+    this._dialogRef.close(data);
   }
 }

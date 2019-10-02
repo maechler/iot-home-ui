@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Settings} from './settings-dialog.component';
+import {RefreshRate, Settings} from './settings-dialog.component';
 import {BehaviorSubject} from 'rxjs';
 
 @Injectable({
@@ -9,7 +9,9 @@ export class SettingsService {
   private readonly _settings = new BehaviorSubject<Settings>({
     influxdbServer: '',
     influxdbDatabase: '',
-    refreshRate: 10,
+    influxdbUsername: '',
+    influxdbPassword: '',
+    refreshRate: RefreshRate.Ten,
   });
   private settingsStorageKey = 'hui.dashboard.settings';
 

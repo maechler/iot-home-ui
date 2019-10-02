@@ -3,8 +3,8 @@ import {SettingsService} from '../../dashboard/settings/settings.service';
 import {Sensor} from './sensor';
 import {HttpClient} from '@angular/common/http';
 import {Unit} from './unit';
-import {BehaviorSubject, Observable, of } from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {BehaviorSubject, Observable, combineLatest, of, interval, timer} from 'rxjs';
+import {catchError, map, switchMap, startWith, retryWhen, delayWhen, tap} from 'rxjs/operators';
 import {Measurement} from './measurement';
 import {MatSnackBar} from '@angular/material';
 import {ConfigurationService} from '../configuration/configuration.service';
@@ -13,9 +13,9 @@ import {ConfigurationService} from '../configuration/configuration.service';
   providedIn: 'root'
 })
 export class SensorService {
-  private _influxdbServer: string;
-  private _influxdbDatabase: string;
-  private _refreshRate: number;
+  private _refreshRate$: Observable<number>;
+  private _valueObservabels = new Map<string, Observable<Measurement>>();
+  private _seriesObservabels = new Map<string, Observable<Measurement[]>>();
 
   constructor(
     private _settingsService: SettingsService,
@@ -23,23 +23,26 @@ export class SensorService {
     private _snackBar: MatSnackBar,
     private _configurationService: ConfigurationService,
   ) {
-    _settingsService.settings$.subscribe(this.handleSettingsChanged.bind(this));
-    this.updateSettings();
+    this._refreshRate$ = _settingsService.settings$.pipe(map(settings => settings.refreshRate));
   }
 
   fetchUnits(): Observable<Unit[]> {
-    return this._httpClient.get<Unit[]>(this._influxdbServer + '/query', {
-      params: {
-        db: this._influxdbDatabase,
-        q: 'SHOW MEASUREMENTS',
-      }
-    }).pipe(
+    return this._settingsService.settings$.pipe(
+      switchMap((settings) => this._httpClient.get<Unit[]>(
+        settings.influxdbServer + '/query',
+        {
+          params: {
+            u: settings.influxdbUsername,
+            p: settings.influxdbPassword,
+            db: settings.influxdbDatabase,
+            q: 'SHOW MEASUREMENTS',
+          },
+        }
+      )),
       map( (response: any) => {
         const responseUnits = response.results[0].series[0].values;
 
-        return responseUnits.map(value => {
-          return {name: value[0]};
-        });
+        return responseUnits.map(value => ({name: value[0]}));
       }),
       catchError( error => {
         this.handleError(error);
@@ -49,12 +52,18 @@ export class SensorService {
   }
 
   fetchSensorsByUnit(unit?: string): Observable<Sensor[]> {
-    return this._httpClient.get<Sensor[]>(this._influxdbServer + '/query', {
-      params: {
-        db: this._influxdbDatabase,
-        q: 'SHOW FIELD KEYS FROM ' + unit,
-      }
-    }).pipe(
+    return this._settingsService.settings$.pipe(
+      switchMap((settings) => this._httpClient.get<Unit[]>(
+        settings.influxdbServer + '/query',
+        {
+          params: {
+            u: settings.influxdbUsername,
+            p: settings.influxdbPassword,
+            db: settings.influxdbDatabase,
+            q: 'SHOW FIELD KEYS FROM ' + unit,
+          },
+        }
+      )),
       map( (response: any) => {
         const responseUnits = response.results[0].series[0].values;
 
@@ -71,100 +80,108 @@ export class SensorService {
   }
 
   getSeriesObservable(unit: string, sensor: string, duration$: BehaviorSubject<string>): Observable<Measurement[]> {
-    const seriesSubject = new BehaviorSubject(null);
-    let currentTimeout = -1;
+    const observableKey = unit + '-' + sensor + '-' + duration$.getValue();
 
-    const fetchSeries = () => {
-      this._httpClient.get<Unit[]>(this._influxdbServer + '/query', {
-        params: {
-          db: this._influxdbDatabase,
-          q: 'SELECT MEAN(' + sensor + ') FROM ' + unit + ' WHERE time > now() - ' + duration$.getValue() + ' GROUP BY time(' + this.durationToGroupByTime(duration$.getValue()) + ')',
-        }
-      }).pipe(
-        map((response: any) => response.results[0].series[0].values.map((value) => ({value: value[1], time: new Date(value[0])}))),
-        catchError( error => {
-          this.handleError(error);
+    if (!this._seriesObservabels.has(observableKey)) {
+      const seriesObservable = this._refreshRate$.pipe(
+        switchMap((refreshRate) => combineLatest([
+          interval(refreshRate * 1000).pipe(startWith(0)),
+          this._settingsService.settings$,
+        ])),
+        switchMap(([i, settings]) => this._httpClient.get<Unit[]>(
+          settings.influxdbServer + '/query',
+          {
+            params: {
+              u: settings.influxdbUsername,
+              p: settings.influxdbPassword,
+              db: settings.influxdbDatabase,
+              q: 'SELECT MEAN(' + sensor + ') FROM ' + unit + ' WHERE time > now() - ' + duration$.getValue() + ' GROUP BY time(' + this.durationToGroupByTime(duration$.getValue()) + ')',
+            },
+          }
+        )),
+        map((response: any) => {
+          if (response.results[0].hasOwnProperty('error')) {
+            this.handleError(response.results[0].error);
 
-          return of({value: 0, time: null});
-        })
-      ).subscribe((measurements) => {
-        seriesSubject.next(measurements);
+            return [{value: 0, time: null}];
+          }
 
-        if (seriesSubject.observers.length > 0) {
-          currentTimeout = setTimeout(fetchSeries, this._refreshRate * 1000);
-        }
-      });
-    };
+          return response.results[0].series[0].values.map((value) => ({value: value[1], time: new Date(value[0])}));
+        }),
+        retryWhen(errors =>
+          errors.pipe(
+            tap(error => this.handleError(error)),
+            delayWhen(val => timer(5000))
+          )
+        )
+      );
 
-    duration$.subscribe(() => {
-      clearTimeout(currentTimeout);
-      fetchSeries();
-    });
+      this._seriesObservabels.set(observableKey, seriesObservable);
+    }
 
-    this._settingsService.settings$.subscribe(() => {
-      clearTimeout(currentTimeout);
-      fetchSeries();
-    });
-
-    fetchSeries();
-
-    return seriesSubject.asObservable();
+    return this._seriesObservabels.get(observableKey);
   }
 
   getValueObservable(unit: string, sensor: string): Observable<Measurement> {
-    const valueSubject = new BehaviorSubject(null);
-    let currentTimeout = -1;
+    const observableKey = unit + '-' + sensor;
 
-    const  fetchValue = () => {
-      this._httpClient.get<Unit[]>(this._influxdbServer + '/query', {
-        params: {
-          db: this._influxdbDatabase,
-          q: 'SELECT ' + sensor + ' FROM ' + unit + ' ORDER BY DESC LIMIT 1 ',
-        }
-      }).pipe(
-        map((response: any) => ({
-          value: response.results[0].series[0].values[0][1],
-          time: new Date(response.results[0].series[0].values[0][0])
-        })),
-        catchError( error => {
-          this.handleError(error);
-          return of({value: 0, time: null});
-        })
-      ).subscribe((measurement) => {
-        valueSubject.next(measurement);
+    if (!this._valueObservabels.has(observableKey)) {
+      const valueObservable = this._refreshRate$.pipe(
+        switchMap((refreshRate) => combineLatest([
+          interval(refreshRate * 1000).pipe(startWith(0)),
+          this._settingsService.settings$,
+        ])),
+        switchMap(([i, settings]) => this._httpClient.get<Unit[]>(
+          settings.influxdbServer + '/query',
+          {
+            params: {
+              u: settings.influxdbUsername,
+              p: settings.influxdbPassword,
+              db: settings.influxdbDatabase,
+              q: 'SELECT ' + sensor + ' FROM ' + unit + ' ORDER BY DESC LIMIT 1 ',
+            },
+          }
+        )),
+        map((response: any) => {
+          if (response.results[0].hasOwnProperty('error')) {
+            this.handleError(response.results[0].error);
 
-        if (valueSubject.observers.length > 0) {
-          currentTimeout = setTimeout(fetchValue, this._refreshRate * 1000);
-        }
-      });
-    };
+            return {value: 0, time: null};
+          }
 
-    this._settingsService.settings$.subscribe(() => {
-      clearTimeout(currentTimeout);
-      fetchValue();
-    });
+          return {
+            value: response.results[0].series[0].values[0][1],
+            time: new Date(response.results[0].series[0].values[0][0])
+          };
+        }),
+        retryWhen(errors =>
+          errors.pipe(
+            tap(error => this.handleError(error)),
+            delayWhen(val => timer(5000))
+          )
+        )
+      );
 
-    fetchValue();
+      this._valueObservabels.set(observableKey, valueObservable);
+    }
 
-    return valueSubject.asObservable();
-  }
-
-  private updateSettings() {
-    this._influxdbServer = this._settingsService.getSettings().influxdbServer.replace(/\/$/, '');
-    this._influxdbDatabase = this._settingsService.getSettings().influxdbDatabase;
-    this._refreshRate = this._settingsService.getSettings().refreshRate;
+    return this._valueObservabels.get(observableKey);
   }
 
   private handleError(error) {
     console.error(error);
 
-    this._snackBar.open('An error happened reading from InfluxDB.', 'OK', {
+    let message = 'Oops, an error occurred reading from InfluxDB.';
+
+    if (typeof error === 'string') {
+      message += ' Error: ' + error;
+    } else if (error.hasOwnProperty('message')) {
+      message += ' Error: ' + error.message;
+    }
+
+    this._snackBar.open(message, 'OK', {
       duration: this._configurationService.defaultSnackBarDuration$.getValue(),
     });
-  }
-
-  private handleSettingsChanged() {
-    this.updateSettings();
   }
 
   private durationToGroupByTime(duration: string): string {
